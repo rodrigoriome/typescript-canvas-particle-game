@@ -1,5 +1,5 @@
 import Positionable from '~/App/Models/Positionable'
-import Point from '~/App/@types/Point'
+import Point from '~/App/Types/Point'
 
 export default class Projectile extends Positionable {
     context: CanvasRenderingContext2D

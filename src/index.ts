@@ -1,3 +1,4 @@
-import main from '~/App/main'
+import Game from '~/App/Game'
+import GameUI from '~/App/GameUI'
 
-main();
+new Game(new GameUI(document.getElementById('root') as HTMLElement)).main()

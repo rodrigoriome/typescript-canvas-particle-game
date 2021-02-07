@@ -1,4 +1,4 @@
-import Point from '~/App/@types/Point'
+import Point from '~/App/Types/Point'
 import Positionable from '~/App/Models/Positionable'
 
 export default class Enemy extends Positionable {
