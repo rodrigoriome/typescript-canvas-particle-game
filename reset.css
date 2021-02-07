@@ -1,0 +1,55 @@
+.game {
+    position: relative;
+}
+
+.game__ui {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    user-select: none;
+}
+
+.game__ui-score {
+    color: white;
+    padding-top: 25px;
+    padding-left: 25px;
+}
+
+.game__ui-game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    text-align: center;
+    padding: 30px;
+    width: 30vw;
+    min-width: 300px;
+    border-radius: 4px;
+}
+
+.game__ui-game-over h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.game__ui-game-over p {
+    font-size: 0.875rem;
+}
+
+.game__ui-game-over button {
+    display: block;
+    background: cornflowerblue;
+    color: white;
+    border-radius: 4px;
+    width: 100%;
+    padding: 8px;
+    margin-top: 30px;
+    transition: background-color 150ms;
+}
+
+.game__ui-game-over button:hover {
+    background: mediumslateblue;
+}
