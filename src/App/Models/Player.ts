@@ -1,4 +1,4 @@
-import Positionable from '~/models/Positionable'
+import Positionable from '~/App/Models/Positionable'
 
 export default class Player extends Positionable {
     context: CanvasRenderingContext2D

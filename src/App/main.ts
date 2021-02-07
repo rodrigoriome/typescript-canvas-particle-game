@@ -1,8 +1,8 @@
 import gsap from 'gsap'
-import Player from '~/models/Player'
-import Projectile from '~/models/Projectile'
-import Enemy from './models/Enemy';
-import Particle from './models/Particle';
+import Player from '~/App/Models/Player'
+import Projectile from '~/App/Models/Projectile'
+import Enemy from './Models/Enemy';
+import Particle from './Models/Particle';
 import Point from './@types/Point';
 
 const randomMin = (value: number, min: number) => Math.random() * (value - min) + min

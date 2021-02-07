@@ -1,7 +1,7 @@
-import Point from '~/@types/Point'
-import Positionable from '~/models/Positionable'
+import Positionable from '~/App/Models/Positionable'
+import Point from '~/App/@types/Point'
 
-export default class Enemy extends Positionable {
+export default class Projectile extends Positionable {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number
@@ -21,7 +21,7 @@ export default class Enemy extends Positionable {
         this.context = context;
         this.xPos = xPos;
         this.yPos = yPos;
-        this.radius = radius
+        this.radius = radius;
         this.color = color;
         this.velocity = velocity;
     }

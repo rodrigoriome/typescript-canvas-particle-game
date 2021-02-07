@@ -1,5 +1,5 @@
-import Point from '~/@types/Point'
-import Positionable from '~/models/Positionable'
+import Point from '~/App/@types/Point'
+import Positionable from '~/App/Models/Positionable'
 
 export default class Particle extends Positionable {
     context: CanvasRenderingContext2D
