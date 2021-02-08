@@ -1,14 +1,15 @@
 import GameState from '../GameState'
 import Point from '../Support/Point'
-import Object from './Object'
+import ObjectAbstract from './ObjectAbstract'
 
-export default class Projectile extends Object {
+export default class Projectile extends ObjectAbstract {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number
     radius: number
     color: string
     velocity: Point
+    acceleration: number
 
     static instances: Projectile[] = []
 
@@ -27,6 +28,7 @@ export default class Projectile extends Object {
         this.radius = radius;
         this.color = color;
         this.velocity = velocity;
+        this.acceleration = GameState.projectileAccel * GameState.projectileAccelMultiplier
 
         Projectile.instances.push(this)
     }
@@ -40,8 +42,8 @@ export default class Projectile extends Object {
 
     update() {
         this.draw()
-        this.xPos = this.xPos + (this.velocity.x * GameState.projectileAccel);
-        this.yPos = this.yPos + (this.velocity.y * GameState.projectileAccel);
+        this.xPos = this.xPos + (this.velocity.x * this.acceleration);
+        this.yPos = this.yPos + (this.velocity.y * this.acceleration);
     }
 
     destroy() {

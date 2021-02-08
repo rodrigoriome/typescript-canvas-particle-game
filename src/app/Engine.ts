@@ -1,14 +1,14 @@
 import gsap from 'gsap'
 
-import Player from "./Models/Player"
-import Projectile from "./Models/Projectile"
-import Enemy from "./Models/Enemy"
-import Particle from "./Models/Particle"
+import Player from "./Objects/Player"
+import Projectile from "./Objects/Projectile"
+import Enemy from "./Objects/Enemy"
+import Particle from "./Objects/Particle"
 
 import GameUI from "./GameUI"
 import GameState from "./GameState"
 
-import { getRandomInt } from './Utils'
+import { getRandomInt } from './Support/Utils'
 
 import '../public/reset.css'
 import '../public/style.css'
@@ -102,6 +102,10 @@ export default class Engine {
         if (GameState.status === 'started') {
             this._player.draw()
 
+            for (const pwr of GameState.powerups) {
+                pwr.apply()
+            }
+
             for (const projectile of Projectile.instances) {
                 const isOutOfCanvasBounds = projectile.xPos + projectile.radius < 0
                     || projectile.yPos + projectile.radius < 0
@@ -163,11 +167,6 @@ export default class Engine {
                 } else {
                     particle.update()
                 }
-            }
-
-            if (GameState.score >= 2000) {
-                GameState.projectileAccel = 8
-                GameState.enemyAccel = 1.5
             }
         }
     }

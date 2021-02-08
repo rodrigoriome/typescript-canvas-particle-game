@@ -1,6 +1,6 @@
-import Object from './Object'
+import ObjectAbstract from './ObjectAbstract'
 
-export default class Player extends Object {
+export default class Player extends ObjectAbstract {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number

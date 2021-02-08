@@ -1,12 +1,10 @@
-import Positionable from "../Support/Positionable"
-
-export default abstract class Object implements Positionable {
+export default abstract class ObjectAbstract {
     abstract context: CanvasRenderingContext2D
     abstract xPos: number
     abstract yPos: number
     abstract radius: number
 
-    isCollidingWith(collidable: Positionable) {
+    isCollidingWith(collidable: ObjectAbstract) {
         const distance = Math.hypot(
             this.xPos - collidable.xPos,
             this.yPos - collidable.yPos

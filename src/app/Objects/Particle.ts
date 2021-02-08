@@ -1,8 +1,8 @@
 import GameState from '../GameState'
-import Object from '../Models/Object'
+import ObjectAbstract from './ObjectAbstract'
 import Point from '../Support/Point'
 
-export default class Particle extends Object {
+export default class Particle extends ObjectAbstract {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number
