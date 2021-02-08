@@ -1,8 +1,8 @@
-import GameState from '~/App/GameState'
-import Point from '~/App/Support/Point'
-import Object from '~/App/Models/Object'
+import GameState from '../GameState'
+import Point from '../Support/Point'
+import Object from './Object'
 
-export default class Enemy extends Object {
+export default class Projectile extends Object {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number
@@ -10,7 +10,7 @@ export default class Enemy extends Object {
     color: string
     velocity: Point
 
-    static instances: Enemy[] = []
+    static instances: Projectile[] = []
 
     constructor(
         context: CanvasRenderingContext2D,
@@ -24,11 +24,11 @@ export default class Enemy extends Object {
         this.context = context;
         this.xPos = xPos;
         this.yPos = yPos;
-        this.radius = radius
+        this.radius = radius;
         this.color = color;
         this.velocity = velocity;
 
-        Enemy.instances.push(this)
+        Projectile.instances.push(this)
     }
 
     draw() {
@@ -40,16 +40,16 @@ export default class Enemy extends Object {
 
     update() {
         this.draw()
-        this.xPos = this.xPos + (this.velocity.x * GameState.enemyAccel);
-        this.yPos = this.yPos + (this.velocity.y * GameState.enemyAccel);
+        this.xPos = this.xPos + (this.velocity.x * GameState.projectileAccel);
+        this.yPos = this.yPos + (this.velocity.y * GameState.projectileAccel);
     }
 
     destroy() {
-        for (let i = 0; i < Enemy.instances.length; i++) {
-            const element = Enemy.instances[i];
+        for (let i = 0; i < Projectile.instances.length; i++) {
+            const element = Projectile.instances[i];
 
             if (element === this) {
-                Enemy.instances.splice(i, 1)
+                Projectile.instances.splice(i, 1)
             }
         }
     }

@@ -1,16 +1,16 @@
 import gsap from 'gsap'
 
-import Player from "~/App/Models/Player"
-import Projectile from "~/App/Models/Projectile"
-import Enemy from "~/App/Models/Enemy"
-import Particle from "~/App/Models/Particle"
+import Player from "./Models/Player"
+import Projectile from "./Models/Projectile"
+import Enemy from "./Models/Enemy"
+import Particle from "./Models/Particle"
 
-import GameUI from "~/App/GameUI"
-import GameState from "~/App/GameState"
+import GameUI from "./GameUI"
+import GameState from "./GameState"
 
-import { getRandomInt } from '~/App/Utils'
+import { getRandomInt } from './Utils'
 
-export default class Game {
+export default class Main {
     gameUi: GameUI
 
     context!: CanvasRenderingContext2D

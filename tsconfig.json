@@ -8,11 +8,7 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "dist",
-    "baseUrl": "./src",
-    "paths": {
-        "~/*": ["./*"],
-    }
+    "outDir": "dist"
   },
   "include": ["src"]
 }

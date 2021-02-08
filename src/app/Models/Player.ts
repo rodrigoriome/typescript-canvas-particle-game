@@ -1,4 +1,4 @@
-import Object from '~/App/Models/Object'
+import Object from './Object'
 
 export default class Player extends Object {
     context: CanvasRenderingContext2D

@@ -1,6 +1,6 @@
-import Point from '~/App/Support/Point'
-import Object from '~/App/Models/Object'
 import GameState from '../GameState'
+import Object from '../Models/Object'
+import Point from '../Support/Point'
 
 export default class Particle extends Object {
     context: CanvasRenderingContext2D

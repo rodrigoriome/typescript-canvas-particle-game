@@ -1,4 +1,4 @@
-import Positionable from "~/App/Support/Positionable"
+import Positionable from "../Support/Positionable"
 
 export default abstract class Object implements Positionable {
     abstract context: CanvasRenderingContext2D

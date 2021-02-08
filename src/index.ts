@@ -1,4 +1,7 @@
-import Game from '~/App/Game'
-import GameUI from '~/App/GameUI'
+import Game from './app/Game'
+import GameUI from './app/GameUI'
+
+import './public/reset.css'
+import './public/style.css'
 
 new Game(new GameUI(document.getElementById('root') as HTMLElement)).main()
