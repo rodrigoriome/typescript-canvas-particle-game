@@ -1,6 +1,7 @@
-import Game from './app/Game'
+import Engine from './app/Engine'
 
-import './public/reset.css'
-import './public/style.css'
+const engine = new Engine(document.getElementById('root') as HTMLElement)
 
-new Game(document.getElementById('root') as HTMLElement)
+addEventListener('resize', function() {
+    engine.resize()
+})

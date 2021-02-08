@@ -10,43 +10,41 @@ import GameState from "./GameState"
 
 import { getRandomInt } from './Utils'
 
-export default class Main {
-    ui: GameUI
+import '../public/reset.css'
+import '../public/style.css'
 
-    context!: CanvasRenderingContext2D
-    animationFrame!: number
+export default class Engine {
+    private _context!: CanvasRenderingContext2D
+    private _ui: GameUI
+    private _animationFrame!: number
+    private _enemySpawnInterval?: NodeJS.Timeout
+    private _player!: Player
 
-    enemySpawnInterval?: NodeJS.Timeout
-
-    player!: Player
-
-    readonly VIEWPORT_CENTER_X = Math.floor(innerWidth / 2);
-    readonly VIEWPORT_CENTER_Y = Math.floor(innerHeight / 2);
+    private readonly _VIEWPORT_CENTER_X = Math.floor(innerWidth / 2);
+    private readonly _VIEWPORT_CENTER_Y = Math.floor(innerHeight / 2);
 
     constructor(rootElement: HTMLElement) {
-        this.ui = new GameUI(rootElement)
-        this.context = this.ui.iCanvas.getContext('2d') as CanvasRenderingContext2D
+        this._ui = new GameUI(rootElement)
+        this._context = this._ui.iCanvas.getContext('2d') as CanvasRenderingContext2D
 
-        this.main()
+        this.start()
     }
 
-    main() {
-        this.ui.iCanvas.width = window.innerWidth
-        this.ui.iCanvas.height = window.innerHeight
-
+    private start(): void {
+        this.resize()
         this.animate()
 
-        this.ui.iRoot.addEventListener('click', (event) => {
+        this._ui.iRoot.addEventListener('click', (event) => {
             if (GameState.status === 'started') {
                 const angle = Math.atan2(
-                    event.clientY - this.VIEWPORT_CENTER_Y,
-                    event.clientX - this.VIEWPORT_CENTER_X
+                    event.clientY - this._VIEWPORT_CENTER_Y,
+                    event.clientX - this._VIEWPORT_CENTER_X
                 )
 
                 new Projectile(
-                    this.context,
-                    this.VIEWPORT_CENTER_X,
-                    this.VIEWPORT_CENTER_Y,
+                    this._context,
+                    this._VIEWPORT_CENTER_X,
+                    this._VIEWPORT_CENTER_Y,
                     5,
                     "white",
                     {
@@ -57,16 +55,16 @@ export default class Main {
             }
         })
 
-        this.ui.iModalStartButton.addEventListener('click', () => {
+        this._ui.iModalStartButton.addEventListener('click', () => {
             this.startGame()
         })
     }
 
-    startGame() {
-        this.player = new Player(
-            this.context,
-            this.VIEWPORT_CENTER_X,
-            this.VIEWPORT_CENTER_Y,
+    private startGame(): void {
+        this._player = new Player(
+            this._context,
+            this._VIEWPORT_CENTER_X,
+            this._VIEWPORT_CENTER_Y,
             10,
             "white"
         );
@@ -79,36 +77,36 @@ export default class Main {
 
         GameState.setDefaultValues()
 
-        this.ui.iModal.style.display = 'none'
+        this._ui.iModal.style.display = 'none'
 
         this.spawnEnemies()
 
         GameState.status = 'started'
     }
 
-    endGame() {
-        if (this.enemySpawnInterval) {
-            clearInterval(this.enemySpawnInterval)
+    private endGame(): void {
+        if (this._enemySpawnInterval) {
+            clearInterval(this._enemySpawnInterval)
         }
 
-        this.ui.iModal.style.display = 'block'
+        this._ui.iModal.style.display = 'block'
 
         GameState.status = 'over'
     }
 
-    animate() {
-        this.animationFrame = requestAnimationFrame(this.animate.bind(this));
-        this.context.fillStyle = 'black'
-        this.context.fillRect(0, 0, this.ui.iCanvas.width, this.ui.iCanvas.height)
+    private animate(): void {
+        this._animationFrame = requestAnimationFrame(this.animate.bind(this));
+        this._context.fillStyle = 'black'
+        this._context.fillRect(0, 0, this._ui.iCanvas.width, this._ui.iCanvas.height)
 
         if (GameState.status === 'started') {
-            this.player.draw()
+            this._player.draw()
 
             for (const projectile of Projectile.instances) {
                 const isOutOfCanvasBounds = projectile.xPos + projectile.radius < 0
                     || projectile.yPos + projectile.radius < 0
-                    || projectile.xPos - projectile.radius > this.ui.iCanvas.width
-                    || projectile.yPos - projectile.radius > this.ui.iCanvas.height
+                    || projectile.xPos - projectile.radius > this._ui.iCanvas.width
+                    || projectile.yPos - projectile.radius > this._ui.iCanvas.height
 
                 if (isOutOfCanvasBounds) {
                     setTimeout(() => {
@@ -122,7 +120,7 @@ export default class Main {
             for (const enemy of Enemy.instances) {
                 enemy.update()
 
-                if (enemy.isCollidingWith(this.player)) {
+                if (enemy.isCollidingWith(this._player)) {
                     this.endGame()
                 }
 
@@ -131,7 +129,7 @@ export default class Main {
                         setTimeout(() => {
                             for (let i = 0; i < enemy.radius; i++) {
                                 new Particle(
-                                    this.context,
+                                    this._context,
                                     projectile.xPos,
                                     projectile.yPos,
                                     getRandomInt(1, 4),
@@ -174,27 +172,27 @@ export default class Main {
         }
     }
 
-    spawnEnemies() {
-        this.enemySpawnInterval = setInterval(() => {
+    private spawnEnemies(): void {
+        this._enemySpawnInterval = setInterval(() => {
             const radius = getRandomInt(10, 30)
             let xPos
             let yPos
 
             if (Math.random() < 0.5) {
-                xPos = Math.random() < 0.5 ? 0 - radius : this.ui.iCanvas.width + radius
-                yPos = Math.random() * this.ui.iCanvas.height
+                xPos = Math.random() < 0.5 ? 0 - radius : this._ui.iCanvas.width + radius
+                yPos = Math.random() * this._ui.iCanvas.height
             } else {
-                xPos = Math.random() * this.ui.iCanvas.width
-                yPos = Math.random() < 0.5 ? 0 - radius : this.ui.iCanvas.height + radius
+                xPos = Math.random() * this._ui.iCanvas.width
+                yPos = Math.random() < 0.5 ? 0 - radius : this._ui.iCanvas.height + radius
             }
 
             const angle = Math.atan2(
-                this.VIEWPORT_CENTER_Y - yPos,
-                this.VIEWPORT_CENTER_X - xPos
+                this._VIEWPORT_CENTER_Y - yPos,
+                this._VIEWPORT_CENTER_X - xPos
             )
 
             new Enemy(
-                this.context,
+                this._context,
                 xPos,
                 yPos,
                 radius,
@@ -207,10 +205,18 @@ export default class Main {
         }, 1000)
     }
 
-    setScore (value: number) {
+    private setScore (value: number): void {
         GameState.score = value
 
-        this.ui.iScoreCounter.innerText = String(value)
-        this.ui.iModalScoreCounter.innerText = String(value)
+        this._ui.iScoreCounter.innerText = String(value)
+        this._ui.iModalScoreCounter.innerText = String(value)
+    }
+
+    /**
+     * Resizes the canvas to fit the window.
+     */
+    public resize(): void {
+        this._ui.iCanvas.width = window.innerWidth
+        this._ui.iCanvas.height = window.innerHeight
     }
 }
