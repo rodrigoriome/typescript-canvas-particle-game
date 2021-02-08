@@ -1,6 +1,6 @@
-import Positionable from '~/App/Models/Positionable'
+import Object from '~/App/Models/Object'
 
-export default class Player extends Positionable {
+export default class Player extends Object {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number

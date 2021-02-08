@@ -1,13 +1,16 @@
-import Positionable from '~/App/Models/Positionable'
-import Point from '~/App/Types/Point'
+import GameState from '~/App/GameState'
+import Object from '~/App/Models/Object'
+import Point from '~/App/Support/Point'
 
-export default class Projectile extends Positionable {
+export default class Projectile extends Object {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number
     radius: number
     color: string
     velocity: Point
+
+    static instances: Projectile[] = []
 
     constructor(
         context: CanvasRenderingContext2D,
@@ -24,6 +27,8 @@ export default class Projectile extends Positionable {
         this.radius = radius;
         this.color = color;
         this.velocity = velocity;
+
+        Projectile.instances.push(this)
     }
 
     draw() {
@@ -35,7 +40,17 @@ export default class Projectile extends Positionable {
 
     update() {
         this.draw()
-        this.xPos = this.xPos + this.velocity.x;
-        this.yPos = this.yPos + this.velocity.y;
+        this.xPos = this.xPos + (this.velocity.x * GameState.projectileAccel);
+        this.yPos = this.yPos + (this.velocity.y * GameState.projectileAccel);
+    }
+
+    destroy() {
+        for (let i = 0; i < Projectile.instances.length; i++) {
+            const element = Projectile.instances[i];
+
+            if (element === this) {
+                Projectile.instances.splice(i, 1)
+            }
+        }
     }
 }

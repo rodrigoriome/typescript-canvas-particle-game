@@ -1,7 +1,8 @@
-import Point from '~/App/Types/Point'
-import Positionable from '~/App/Models/Positionable'
+import Point from '~/App/Support/Point'
+import Object from '~/App/Models/Object'
+import GameState from '../GameState'
 
-export default class Particle extends Positionable {
+export default class Particle extends Object {
     context: CanvasRenderingContext2D
     xPos: number
     yPos: number
@@ -10,6 +11,8 @@ export default class Particle extends Positionable {
     velocity: Point
     alpha: number
     friction: number
+
+    static instances: Particle[] = []
 
     constructor(
         context: CanvasRenderingContext2D,
@@ -28,6 +31,8 @@ export default class Particle extends Positionable {
         this.velocity = velocity;
         this.alpha = 1
         this.friction = 0.02
+
+        Particle.instances.push(this)
     }
 
     draw() {
@@ -46,8 +51,18 @@ export default class Particle extends Positionable {
         this.velocity.x *= 1 - this.friction
         this.velocity.y *= 1 - this.friction
 
-        this.xPos = this.xPos + this.velocity.x;
-        this.yPos = this.yPos + this.velocity.y;
+        this.xPos = this.xPos + (this.velocity.x * GameState.particleAccel);
+        this.yPos = this.yPos + (this.velocity.y * GameState.particleAccel);
         this.alpha -= 0.01
+    }
+
+    destroy() {
+        for (let i = 0; i < Particle.instances.length; i++) {
+            const element = Particle.instances[i];
+
+            if (element === this) {
+                Particle.instances.splice(i, 1)
+            }
+        }
     }
 }

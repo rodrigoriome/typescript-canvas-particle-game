@@ -6,9 +6,9 @@ import Enemy from "~/App/Models/Enemy"
 import Particle from "~/App/Models/Particle"
 
 import GameUI from "~/App/GameUI"
-import Point from "~/App/Types/Point"
+import GameState from "~/App/GameState"
 
-const randomMin = (value: number, min: number) => Math.random() * (value - min) + min
+import { getRandomInt } from '~/App/Utils'
 
 export default class Game {
     gameUi: GameUI
@@ -18,16 +18,7 @@ export default class Game {
 
     enemySpawnInterval?: NodeJS.Timeout
 
-    score: number
-    status: 'idle' | 'started' | 'over'
-
-    // The Player
     player!: Player
-
-    // Instances
-    projectileInstances!: Projectile[]
-    enemyInstances!: Enemy[]
-    particleInstances!: Particle[]
 
     readonly VIEWPORT_CENTER_X = Math.floor(innerWidth / 2);
     readonly VIEWPORT_CENTER_Y = Math.floor(innerHeight / 2);
@@ -35,9 +26,6 @@ export default class Game {
     constructor(gameUi: GameUI) {
         this.gameUi = gameUi
         this.context = this.gameUi.canvas.getContext('2d') as CanvasRenderingContext2D
-
-        this.score = 0
-        this.status = 'idle'
     }
 
     main() {
@@ -47,34 +35,32 @@ export default class Game {
         this.animate()
 
         this.gameUi.root.addEventListener('click', (event) => {
-            const angle = Math.atan2(
-                event.clientY - this.VIEWPORT_CENTER_Y,
-                event.clientX - this.VIEWPORT_CENTER_X
-            )
+            if (GameState.status === 'started') {
+                const angle = Math.atan2(
+                    event.clientY - this.VIEWPORT_CENTER_Y,
+                    event.clientX - this.VIEWPORT_CENTER_X
+                )
 
-            const accel = 10
-
-            const velocity = {
-                x: Math.cos(angle) * accel,
-                y: Math.sin(angle) * accel,
+                new Projectile(
+                    this.context,
+                    this.VIEWPORT_CENTER_X,
+                    this.VIEWPORT_CENTER_Y,
+                    5,
+                    "white",
+                    {
+                        x: Math.cos(angle),
+                        y: Math.sin(angle),
+                    }
+                )
             }
-
-            this.projectileInstances.push(new Projectile(
-                this.context,
-                this.VIEWPORT_CENTER_X,
-                this.VIEWPORT_CENTER_Y,
-                5,
-                "white",
-                velocity
-            ))
         })
 
         this.gameUi.modalStartButton.addEventListener('click', () => {
-            this.start_game()
+            this.startGame()
         })
     }
 
-    start_game() {
+    startGame() {
         this.player = new Player(
             this.context,
             this.VIEWPORT_CENTER_X,
@@ -83,28 +69,29 @@ export default class Game {
             "white"
         );
 
-        this.projectileInstances = []
-        this.enemyInstances = []
-        this.particleInstances = []
-        this.set_score(0)
+        Projectile.instances = []
+        Enemy.instances = []
+        Particle.instances = []
+
+        this.setScore(0)
+
+        GameState.setDefaultValues()
 
         this.gameUi.modal.style.display = 'none'
 
-        this.spawn_enemies()
+        this.spawnEnemies()
 
-        this.status = 'started'
+        GameState.status = 'started'
     }
 
-    end_game() {
+    endGame() {
         if (this.enemySpawnInterval) {
             clearInterval(this.enemySpawnInterval)
         }
 
         this.gameUi.modal.style.display = 'block'
 
-        this.status = 'over'
-
-        // cancelAnimationFrame(this.animationFrame)
+        GameState.status = 'over'
     }
 
     animate() {
@@ -112,79 +99,82 @@ export default class Game {
         this.context.fillStyle = 'black'
         this.context.fillRect(0, 0, this.gameUi.canvas.width, this.gameUi.canvas.height)
 
-        if (this.status === 'started') {
+        if (GameState.status === 'started') {
             this.player.draw()
 
-            this.projectileInstances.forEach((projectile, index) => {
-                projectile.update()
-
-                const isOutOfCanvasBounds = false
-                    || projectile.xPos + projectile.radius < 0
+            for (const projectile of Projectile.instances) {
+                const isOutOfCanvasBounds = projectile.xPos + projectile.radius < 0
                     || projectile.yPos + projectile.radius < 0
                     || projectile.xPos - projectile.radius > this.gameUi.canvas.width
                     || projectile.yPos - projectile.radius > this.gameUi.canvas.height
 
                 if (isOutOfCanvasBounds) {
                     setTimeout(() => {
-                        this.projectileInstances.splice(index, 1)
+                        projectile.destroy()
                     }, 0)
+                } else {
+                    projectile.update()
                 }
-            })
+            }
 
-            this.enemyInstances.forEach((enemy, enemyIndex) => {
+            for (const enemy of Enemy.instances) {
                 enemy.update()
 
                 if (enemy.isCollidingWith(this.player)) {
-                    this.end_game()
+                    this.endGame()
                 }
 
-                this.projectileInstances.forEach((projectile, projectileIndex) => {
+                for (const projectile of Projectile.instances) {
                     if (enemy.isCollidingWith(projectile)) {
                         setTimeout(() => {
                             for (let i = 0; i < enemy.radius; i++) {
-                                this.particleInstances.push(new Particle(
+                                new Particle(
                                     this.context,
                                     projectile.xPos,
                                     projectile.yPos,
-                                    randomMin(4, 1),
+                                    getRandomInt(1, 4),
                                     enemy.color,
                                     {
-                                        x: (Math.random() - 0.5) * (Math.random() * 6),
-                                        y: (Math.random() - 0.5) * (Math.random() * 6),
+                                        x: Math.random() - 0.5,
+                                        y: Math.random() - 0.5,
                                     }
-                                ))
+                                )
                             }
 
-                            if (enemy.radius - 10 < 5) {
-                                this.set_score(this.score + 250)
-                                this.enemyInstances.splice(enemyIndex, 1)
+                            if (enemy.radius - 10 < 10) {
+                                this.setScore(GameState.score + 250)
+                                enemy.destroy()
                             } else {
-                                this.set_score(this.score + 100)
+                                this.setScore(GameState.score + 100)
                                 gsap.to(enemy, {
                                     radius: enemy.radius - 10
                                 })
                             }
 
-                            this.projectileInstances.splice(projectileIndex, 1)
+                            projectile.destroy()
                         }, 0)
                     }
-                })
-            })
+                }
+            }
 
-            this.particleInstances.forEach((particle, index) => {
+            for (const particle of Particle.instances) {
                 if(particle.alpha <= 0) {
-                    this.particleInstances.splice(index, 1)
+                    particle.destroy()
                 } else {
                     particle.update()
                 }
-            })
+            }
+
+            if (GameState.score >= 2000) {
+                GameState.projectileAccel = 8
+                GameState.enemyAccel = 1.5
+            }
         }
     }
 
-    spawn_enemies() {
+    spawnEnemies() {
         this.enemySpawnInterval = setInterval(() => {
-            const radius = randomMin(30, 10)
-            const color = `hsl(${Math.random() * 360}, 50%, 50%)`
+            const radius = getRandomInt(10, 30)
             let xPos
             let yPos
 
@@ -201,24 +191,22 @@ export default class Game {
                 this.VIEWPORT_CENTER_X - xPos
             )
 
-            const enemyVelocity: Point = {
-                x: Math.cos(angle),
-                y: Math.sin(angle),
-            }
-
-            this.enemyInstances.push(new Enemy(
+            new Enemy(
                 this.context,
                 xPos,
                 yPos,
                 radius,
-                color,
-                enemyVelocity
-            ))
+                `hsl(${Math.random() * 360}, 50%, 50%)`,
+                {
+                    x: Math.cos(angle),
+                    y: Math.sin(angle),
+                }
+            )
         }, 1000)
     }
 
-    set_score (value: number) {
-        this.score = value
+    setScore (value: number) {
+        GameState.score = value
 
         this.gameUi.scoreCounter.innerText = String(value)
         this.gameUi.modalScoreCounter.innerText = String(value)
