@@ -11,7 +11,7 @@ import GameState from "./GameState"
 import { getRandomInt } from './Utils'
 
 export default class Main {
-    gameUi: GameUI
+    ui: GameUI
 
     context!: CanvasRenderingContext2D
     animationFrame!: number
@@ -23,18 +23,20 @@ export default class Main {
     readonly VIEWPORT_CENTER_X = Math.floor(innerWidth / 2);
     readonly VIEWPORT_CENTER_Y = Math.floor(innerHeight / 2);
 
-    constructor(gameUi: GameUI) {
-        this.gameUi = gameUi
-        this.context = this.gameUi.canvas.getContext('2d') as CanvasRenderingContext2D
+    constructor(rootElement: HTMLElement) {
+        this.ui = new GameUI(rootElement)
+        this.context = this.ui.iCanvas.getContext('2d') as CanvasRenderingContext2D
+
+        this.main()
     }
 
     main() {
-        this.gameUi.canvas.width = window.innerWidth
-        this.gameUi.canvas.height = window.innerHeight
+        this.ui.iCanvas.width = window.innerWidth
+        this.ui.iCanvas.height = window.innerHeight
 
         this.animate()
 
-        this.gameUi.root.addEventListener('click', (event) => {
+        this.ui.iRoot.addEventListener('click', (event) => {
             if (GameState.status === 'started') {
                 const angle = Math.atan2(
                     event.clientY - this.VIEWPORT_CENTER_Y,
@@ -55,7 +57,7 @@ export default class Main {
             }
         })
 
-        this.gameUi.modalStartButton.addEventListener('click', () => {
+        this.ui.iModalStartButton.addEventListener('click', () => {
             this.startGame()
         })
     }
@@ -77,7 +79,7 @@ export default class Main {
 
         GameState.setDefaultValues()
 
-        this.gameUi.modal.style.display = 'none'
+        this.ui.iModal.style.display = 'none'
 
         this.spawnEnemies()
 
@@ -89,7 +91,7 @@ export default class Main {
             clearInterval(this.enemySpawnInterval)
         }
 
-        this.gameUi.modal.style.display = 'block'
+        this.ui.iModal.style.display = 'block'
 
         GameState.status = 'over'
     }
@@ -97,7 +99,7 @@ export default class Main {
     animate() {
         this.animationFrame = requestAnimationFrame(this.animate.bind(this));
         this.context.fillStyle = 'black'
-        this.context.fillRect(0, 0, this.gameUi.canvas.width, this.gameUi.canvas.height)
+        this.context.fillRect(0, 0, this.ui.iCanvas.width, this.ui.iCanvas.height)
 
         if (GameState.status === 'started') {
             this.player.draw()
@@ -105,8 +107,8 @@ export default class Main {
             for (const projectile of Projectile.instances) {
                 const isOutOfCanvasBounds = projectile.xPos + projectile.radius < 0
                     || projectile.yPos + projectile.radius < 0
-                    || projectile.xPos - projectile.radius > this.gameUi.canvas.width
-                    || projectile.yPos - projectile.radius > this.gameUi.canvas.height
+                    || projectile.xPos - projectile.radius > this.ui.iCanvas.width
+                    || projectile.yPos - projectile.radius > this.ui.iCanvas.height
 
                 if (isOutOfCanvasBounds) {
                     setTimeout(() => {
@@ -179,11 +181,11 @@ export default class Main {
             let yPos
 
             if (Math.random() < 0.5) {
-                xPos = Math.random() < 0.5 ? 0 - radius : this.gameUi.canvas.width + radius
-                yPos = Math.random() * this.gameUi.canvas.height
+                xPos = Math.random() < 0.5 ? 0 - radius : this.ui.iCanvas.width + radius
+                yPos = Math.random() * this.ui.iCanvas.height
             } else {
-                xPos = Math.random() * this.gameUi.canvas.width
-                yPos = Math.random() < 0.5 ? 0 - radius : this.gameUi.canvas.height + radius
+                xPos = Math.random() * this.ui.iCanvas.width
+                yPos = Math.random() < 0.5 ? 0 - radius : this.ui.iCanvas.height + radius
             }
 
             const angle = Math.atan2(
@@ -208,7 +210,7 @@ export default class Main {
     setScore (value: number) {
         GameState.score = value
 
-        this.gameUi.scoreCounter.innerText = String(value)
-        this.gameUi.modalScoreCounter.innerText = String(value)
+        this.ui.iScoreCounter.innerText = String(value)
+        this.ui.iModalScoreCounter.innerText = String(value)
     }
 }

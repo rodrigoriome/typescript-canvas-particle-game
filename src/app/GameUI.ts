@@ -1,17 +1,44 @@
 export default class GameUI {
-    root: HTMLElement
-    canvas: HTMLCanvasElement
-    scoreCounter: HTMLElement
-    modal: HTMLElement
-    modalScoreCounter: HTMLElement
-    modalStartButton: HTMLElement
+    // Interface main elements
+    iRoot: HTMLElement
+    iCanvas: HTMLCanvasElement
 
-    constructor(rootEl: HTMLElement) {
-        this.root = rootEl
-        this.canvas = this.root.querySelector('#gameCanvas') as HTMLCanvasElement
-        this.scoreCounter = this.root.querySelector('#gameScoreCounter') as HTMLSpanElement
-        this.modal = this.root.querySelector('#gameModal') as HTMLDivElement
-        this.modalScoreCounter = this.root.querySelector('#gameModalScore') as HTMLHeadingElement
-        this.modalStartButton = this.root.querySelector('#gameStartGameButton') as HTMLButtonElement
+    // Interface container
+    iContainer: HTMLElement
+
+    // Interface elements
+    iScoreCounter: HTMLElement
+    iModal: HTMLElement
+    iModalScoreCounter: HTMLElement
+    iModalStartButton: HTMLElement
+
+    constructor(rootElement: HTMLElement) {
+        this.iRoot = rootElement
+        this.iCanvas = document.createElement('canvas')
+
+        this.iContainer = document.createElement('div')
+        this.iContainer.classList.add('game__ui')
+        this.iContainer.innerHTML = `
+        <div class="game__ui-score">
+            <span>Score: </span>
+            <span id="gameScoreCounter">0</span>
+        </div>
+
+        <div class="game__ui-modal" id="gameModal">
+            <h1 id="gameModalScore">0</h1>
+            <p>Points</p>
+            <div>
+                <button id="gameStartButton">Start Game</button>
+            </div>
+        </div>
+        `
+
+        this.iScoreCounter = this.iContainer.querySelector('#gameScoreCounter') as HTMLElement
+        this.iModal = this.iContainer.querySelector('#gameModal') as HTMLElement
+        this.iModalScoreCounter = this.iContainer.querySelector('#gameModalScore') as HTMLElement
+        this.iModalStartButton = this.iContainer.querySelector('#gameStartButton') as HTMLElement
+
+        this.iRoot.appendChild(this.iCanvas)
+        this.iRoot.appendChild(this.iContainer)
     }
 }
